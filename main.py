@@ -2,7 +2,6 @@
 import urllib.request
 #from bs4 import BeautifulSoup
 import sqlite3
-import json
 from pokemontcgsdk import Card
 from pokemontcgsdk import Set
 from pokemontcgsdk import Type
@@ -29,10 +28,23 @@ card_num='1'
 #expansion='sm4'
 #card_num='31'
 
-cards = Card.where(set='generations').where(supertype='pokemon').all()
-for card in cards:
-    card_name = card.name
+
+
+def create_connection(db_file):
+    """ Create a database connection to the SQLite database specified by db_file
+        :param dbfile: database file
+        :return: Connection object or None
+    """
+    try:
+        conn = sqlite3.connect(db_file)
+        return conn
+    except Error as e:
+        print(e)
+    return None
+
+def insert_card(card):
     card_id = card.id
+    card_name = card.name
     card_national_pokedex_number = card.national_pokedex_number
     card_image_SD = card.image_url
     card_image_HD = card.image_url_hi_res
@@ -44,7 +56,7 @@ for card in cards:
     card_illustrator = card.artist
     card_rarity = card.rarity
     card_series = card.series
-    card_expansion = card.expansion
+    card_expansion = card.set
     card_expansion_code = card.set_code
     card_expansion_code_ptcgo = ""  #<FIXME>
     card_text = card.text
@@ -54,7 +66,36 @@ for card in cards:
     card_weaknesses = card.weaknesses
     card_resistances = card.resistances
     card_retreat_cost = card.retreat_cost
-    print(card.__dict__)
+    t = (card_id,
+         card_name,
+         card_expansion_code,
+         card_number,
+         card_national_pokedex_number,
+         card_types,
+         card_subtype,
+         card_supertype,
+         card_illustrator,
+         card_image_SD,
+         card_image_HD,
+         card_rarity,
+         card_hp,
+         card_text,
+         card_weaknesses,
+         card_resistances,
+         card_retreat_cost,
+         card_ancient_trait,
+         card_ability,
+         card_ability,
+         card_ability)
+    
+    c = conn.cursor()
+    print("INSERT INTO Card VALUES {}".format(t))
+    c.execute("INSERT INTO Card VALUES {}".format(t))
+
+cards = Card.where(set='generations').where(supertype='pokemon').all()
+conn = create_connection("ptcg.db")
+for card in cards:
+    insert_card(card)
 
 '''
 database = sqlite3.connect("ptcg.db")
