@@ -97,9 +97,6 @@ def insert_card(card):
     # c.execute("INSERT INTO Card VALUES {}".format(card_index))
 
 def insert_energy_cost(card_id, energy_cost_type, energy_cost_array, energy_cost_attackID=None):
-    print(
-        "Inserting energy:\n{}\n{}\n{}\n{}".format(card_id, energy_cost_type, energy_cost_array, energy_cost_attackID)
-    )
     energy_cost_converted = 0
     colorless_energy = 0
     darkness_energy = 0
@@ -112,30 +109,29 @@ def insert_energy_cost(card_id, energy_cost_type, energy_cost_array, energy_cost
     psychic_energy = 0
     water_energy = 0
     
-    if not energy_cost_array:
-    
-    for energy in energy_cost_array:
-        if 'Colorless' in energy:
-            colorless_energy    += 1
-        if 'Darkness' in energy:
-            darkness_energy     += 1
-        if 'Fairy' in energy:
-            fairy_energy        += 1
-        if 'Fighting' in energy:
-            fighting_energy     += 1
-        if 'Fire' in energy:
-            fire_energy         += 1
-        if 'Grass' in energy:
-            grass_energy        += 1
-        if 'Lightning' in energy:
-            lightning_energy    += 1
-        if 'Metal' in energy:
-            metal_energy        += 1
-        if 'Psychic' in energy:
-            psychic_energy      += 1
-        if 'Water' in energy:
-            water_energy        += 1
-        energy_cost_converted   += 1
+    if energy_cost_array:
+        for energy in energy_cost_array:
+            if 'Colorless' in energy:
+                colorless_energy    += 1
+            if 'Darkness' in energy:
+                darkness_energy     += 1
+            if 'Fairy' in energy:
+                fairy_energy        += 1
+            if 'Fighting' in energy:
+                fighting_energy     += 1
+            if 'Fire' in energy:
+                fire_energy         += 1
+            if 'Grass' in energy:
+                grass_energy        += 1
+            if 'Lightning' in energy:
+                lightning_energy    += 1
+            if 'Metal' in energy:
+                metal_energy        += 1
+            if 'Psychic' in energy:
+                psychic_energy      += 1
+            if 'Water' in energy:
+                water_energy        += 1
+            energy_cost_converted   += 1
     
     energy_index = (
         card_id,
@@ -158,55 +154,3 @@ cards = Card.where(set='generations').where(supertype='pokemon').all()
 conn = create_connection("ptcg.db")
 for card in cards:
     insert_card(card)
-
-'''
-database = sqlite3.connect("ptcg.db")
-c = database.cursor()
-with urllib.request.urlopen('{}/{}/{}/{}'.format(poke_url, series, expansion, card_num)) as response:
-    html = response.read()
-    soup = BeautifulSoup(html, 'html.parser')
-    card_id = soup.find(class_="full-card-information").get('data-card-id')
-    card_image = soup.find(class_="card-image").find('img').get('src')
-    card_name = soup.find(class_="card-description").find('div').find('h1').text
-    card_type = soup.find(class_="card-type").find('h2').text
-    try:
-        card_preevolution = soup.find(class_="card-type").find('h4').find('a').text.strip()
-    except: pass
-    if "Trainer" not in card_type:
-        card_hp = soup.find(class_="card-hp").text[2:]
-        card_poketype = []
-        poketypes = soup.find(class_="card-basic-info").find(class_="right").find_all('a')
-        for poketype in poketypes:
-            card_poketype.append(poketype.find('i').get('class')[1][5:])
-        card_pokemon_abilities = soup.find(class_="pokemon-abilities")
-        card_pokemon_attacks = card_pokemon_abilities.find_all(class_="ability")
-        ##card_ability = soup.find_all(class_="ability").find('div').find('h1').text##
-        #card_poke_ability = [ soup.find(class_='poke-ability').text,  soup.find(class_='pokemon-abilities').find('h3').text.split()[len(soup.find(class_='poke-ability').text):], soup.find(class_='pokemon-abilities').find('p').text ]
-        #print(soup.find(class_='pokemon-abilities').find('h3').text) #.split())
-        card_stats = soup.find_all(class_="stat")
-        for stat in card_stats:
-            stat_category = stat.find('h4').text
-            if stat_category == 'Weakness':
-                try:
-                    weakness_type = stat.find('ul').find('li').get('title')
-                    weakness_modifier = stat.find('ul').find('li').text.split()[0]
-                except:
-                    print('No weaknesses?')
-            if stat_category == 'Resistance':
-                try:
-                    resistance_type = stat.find('ul').find('li').get('title')
-                    resistance_modifier = stat.find('ul').find('li').text.split()[0]
-                except:
-                    print('No resistances?')
-                pass
-            if stat_category == 'Retreat Cost':
-                try:
-                    retreat_costs = stat.find('ul').find_all('li')
-                except:
-                    retreat_cost = '0'
-    card_expansion = soup.find(class_='stats-footer').find('h3').find('a').text
-    card_number = soup.find(class_='stats-footer').find('span').text.split()[0].split('/')
-    card_expansion_icon = soup.find(class_="expansion").find('a').find('i').get('style')
-    card_illustrator = soup.find(class_="illustrator").find('h4').find('a').text
-    print(card_pokemon_attacks)
-'''
