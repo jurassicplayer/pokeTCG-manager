@@ -72,7 +72,6 @@ def insert_card(card):
         card_expansion_code,
         card_number,
         card_national_dex,
-        #card_types,
         card_subtype,
         card_supertype,
         card_illustrator,
@@ -83,13 +82,15 @@ def insert_card(card):
         card_text,
         card_weaknesses,
         card_resistances,
-        #card_retreat_cost,
         card_ancient_trait,
         card_ability,
         card_ability,
         card_ability
         )
-    insert_energy_cost(card_id, 'Pokemon Type', card_types)
+    print(card_attacks)
+    for attack in card_attacks:
+        insert_energy_cost(card_id, 'Attack', attack['cost'], energy_cost_attackID=attack['name'])
+    insert_energy_cost(card_id, 'PokeType', card_types)
     insert_energy_cost(card_id, 'Retreat', card_retreat_cost)
     
     c = conn.cursor()
@@ -147,10 +148,20 @@ def insert_energy_cost(card_id, energy_cost_type, energy_cost_array, energy_cost
         lightning_energy,
         metal_energy,
         psychic_energy,
-        water_energy
+        water_energy,
         )
+        
+    c = conn.cursor()
+    if energy_cost_attackID:
+        c.execute("DELETE FROM EnergyCost WHERE cardID=? AND costType=? AND attackID=?", (card_id, energy_cost_type, energy_cost_attackID))
+    else:
+        c.execute("DELETE FROM EnergyCost WHERE cardID=? AND costType=? AND attackID IS NULL", (card_id, energy_cost_type))
+    c.execute("INSERT INTO EnergyCost VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)", energy_index)
+    print("Inserted EnergyCost: {} {} {} {}".format(card_id, energy_cost_type, energy_cost_attackID, energy_cost_converted))
 
 cards = Card.where(set='generations').where(supertype='pokemon').all()
 conn = create_connection("ptcg.db")
 for card in cards:
     insert_card(card)
+conn.commit()
+conn.close()
